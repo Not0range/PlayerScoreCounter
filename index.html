@@ -5,6 +5,7 @@
         <title>Счётчик</title>
 
         <script src="https://unpkg.com/vue@3.2.36/dist/vue.global.prod.js"></script>
+        <script src="https://unpkg.com/js-cookie@3.0.1/dist/js.cookie.min.js"></script>
         <style>
           #app {
             display: flex; 
@@ -63,33 +64,46 @@
         </div>
         
         <script>
-            Vue.createApp({
-              data() {
-                return {
-                  score: [],
-                  newPlayer: '',
-                  lastId: 0
-                }
-              },
-              computed: {
-                  
-              },
-              methods: {
-                addPlayer() {
-                  if (this.newPlayer.trim() == '')
-                    return;
-                  this.score.push({ id: this.lastId++, name: this.newPlayer, score: 0, tempScore: 1} );
-                  this.newPlayer = '';
-                },
-                removePlayer(id) {
-                  this.score.splice(this.score.indexOf(this.score.find(i => i.id == id)), 1);
-                },
-                addScore(player) {
-                  player.score += player.tempScore;
-                  player.tempScore = 1;
-                }
+          let arr = JSON.parse(Cookies.get('score'));
+          let score = [];
+          for (this.lastId = 0; this.lastId < arr.length; this.lastId++)
+            score.push({ id: this.lastId, 
+              name: arr[this.lastId].name, 
+              score: arr[this.lastId].score, 
+              tempScore: 1});
+          Vue.createApp({
+            data() {
+              return {
+                score: [...score],
+                newPlayer: '',
+                lastId: 0
               }
-            }).mount('#app')
-          </script>
+            },
+            computed: {
+                
+            },
+            methods: {
+              addPlayer() {
+                if (this.newPlayer.trim() == '')
+                  return;
+                this.score.push({ id: this.lastId++, name: this.newPlayer, score: 0, tempScore: 1});
+                this.newPlayer = '';
+                Cookies.set('score', 
+                  JSON.stringify(this.score.map(t => ({name: t.name, score: t.score}))));
+              },
+              removePlayer(id) {
+                this.score.splice(this.score.indexOf(this.score.find(i => i.id == id)), 1);
+                Cookies.set('score', 
+                  JSON.stringify(this.score.map(t => ({name: t.name, score: t.score}))));
+              },
+              addScore(player) {
+                player.score += player.tempScore;
+                player.tempScore = 1;
+                Cookies.set('score', 
+                  JSON.stringify(this.score.map(t => ({name: t.name, score: t.score}))));
+              }
+            }
+          }).mount('#app')
+        </script>
     </body>
 </html>

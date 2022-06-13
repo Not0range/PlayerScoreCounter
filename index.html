@@ -64,7 +64,10 @@
         </div>
         
         <script>
-          let arr = JSON.parse(Cookies.get('score'));
+          let arr;
+          if (!Cookies.get('score'))
+            Cookies.set('score', '[]');
+          arr = JSON.parse(Cookies.get('score'));
           let score = [];
           for (this.lastId = 0; this.lastId < arr.length; this.lastId++)
             score.push({ id: this.lastId, 
